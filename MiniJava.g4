@@ -101,10 +101,10 @@ STRING
     : '"' .*? '"'
     ;
 
-// x = 2;       // assignment
-// (expr);
-// int x = 2;   // declaration (with initialization)
+LINE_COMMENT
+    : '//' .*? ('\n' | EOF) -> skip
+    ;
 
-// 5;       //not allowed in Java
-// x = 2;   // allowed
-// Math.pow(x, 2); // allowed
+BLOCK_COMMENT
+    : '/*' .*? '*/'         -> skip
+    ;
