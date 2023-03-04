@@ -97,7 +97,6 @@ returns [Expression n]
         $n = new StringLiteral($STRING.text);
     }
     | NAME {
-        // Blah blah
         $n = new VariableAccess($NAME.text);
     }
     | '(' expression ')' {
@@ -105,7 +104,6 @@ returns [Expression n]
     }
     | l=expression op=('++' | '--') {
         $n = new PostIncrement($l.n, $op.text);
-        //$n = new PostIncrement(new VariableAccess("dummy"), $op.text);
     }
     | op=('++' | '--' | '+' | '-') expression {
         if ($op.text.equals("++") || $op.text.equals("--"))
