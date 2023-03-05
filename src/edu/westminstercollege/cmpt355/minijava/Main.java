@@ -12,7 +12,9 @@ public class Main {
         var parser = new MiniJavaParser(new CommonTokenStream(lexer));
 
         var ast = parser.goal().n;
-
         AST.print(ast);
+
+        AST.checkForNulls(ast); // for debugging — throws an exception if AST contains any null nodes
+
     }
 }
