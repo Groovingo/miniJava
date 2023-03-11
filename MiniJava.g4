@@ -19,26 +19,26 @@ returns [Statement n]
         var statements = new ArrayList<Statement>();
         for (var stmt : $stmts)
             statements.add(stmt.n);
-        $n = new Block(statements);
+        $n = new Block($ctx, statements);
     }
     ;
 
 statement
 returns [Statement n]
     : ';' {
-        $n = new EmptyStatement();
+        $n = new EmptyStatement($ctx);
     }
     | '{' (stmts+=statement)* '}' {
         var statements = new ArrayList<Statement>();
         for (var stmt : $stmts)
             statements.add(stmt.n);
-        $n = new Block(statements);
+        $n = new Block($ctx, statements);
     }
     | declaration {
         $n = $declaration.n;
     }
     | expression ';' {
-        $n = new ExpressionStatement($expression.n);
+        $n = new ExpressionStatement($ctx, $expression.n);
     }
     ;
 
@@ -48,17 +48,17 @@ returns [VariableDeclarations n]
         var items = new ArrayList<DeclarationItem>();
         for (var decl : $decls)
             items.add(decl.n);
-        $n = new VariableDeclarations($type.n, items);
+        $n = new VariableDeclarations($ctx, $type.n, items);
     }
     ;
 
 declarationItem
 returns [DeclarationItem n]
     : NAME {
-        $n = new DeclarationItem($NAME.text, Optional.empty());
+        $n = new DeclarationItem($ctx, $NAME.text, Optional.empty());
     }
     | NAME '=' expression {
-        $n = new DeclarationItem($NAME.text, Optional.of($expression.n));
+        $n = new DeclarationItem($ctx, $NAME.text, Optional.of($expression.n));
     }
     ;
 
@@ -68,14 +68,14 @@ returns [TypeNode n]
         $n = $primitiveType.n;
     }
     | NAME {
-        $n = new TypeNode($NAME.text);
+        $n = new TypeNode($ctx, $NAME.text);
     }
     ;
 
 primitiveType
 returns [TypeNode n]
     : t=('int' | 'double' | 'boolean') {
-        $n = new TypeNode($t.text);
+        $n = new TypeNode($ctx, $t.text);
     }
     ;
 
@@ -85,19 +85,19 @@ returns [Expression n]
         $n = $print.n;
     }
     | INT {
-        $n = new IntLiteral($INT.text);
+        $n = new IntLiteral($ctx, $INT.text);
     }
     | DOUBLE {
-        $n = new DoubleLiteral($DOUBLE.text);
+        $n = new DoubleLiteral($ctx, $DOUBLE.text);
     }
     | BOOLEAN {
-        $n = new BooleanLiteral($BOOLEAN.text);
+        $n = new BooleanLiteral($ctx, $BOOLEAN.text);
     }
     | STRING {
-        $n = new StringLiteral($STRING.text);
+        $n = new StringLiteral($ctx, $STRING.text);
     }
     | NAME {
-        $n = new VariableAccess($NAME.text);
+        $n = new VariableAccess($ctx, $NAME.text);
     }
     | '(' expression ')' {
         $n = $expression.n;
@@ -107,23 +107,23 @@ returns [Expression n]
     }
     | op=('++' | '--' | '+' | '-') expression {
         if ($op.text.equals("++") || $op.text.equals("--"))
-            $n = new PreIncrement($expression.n, $op.text);
+            $n = new PreIncrement($ctx, $expression.n, $op.text);
         else if ($op.text.equals("-"))
-            $n = new Negate($expression.n);
+            $n = new Negate($ctx, $expression.n);
         else
             $n = $expression.n;
     }
     | '(' type ')' expression {
-        $n = new Cast($type.n, $expression.n);
+        $n = new Cast($ctx, $type.n, $expression.n);
     }
     | l=expression op=('*' | '/' | '%') r=expression {
-        $n = new BinaryOp($l.n, $r.n, $op.text);
+        $n = new BinaryOp($ctx, $l.n, $r.n, $op.text);
     }
     | l=expression op=('+' | '-') r=expression {
-        $n = new BinaryOp($l.n, $r.n, $op.text);
+        $n = new BinaryOp($ctx, $l.n, $r.n, $op.text);
     }
     | <assoc=right> lhs=expression '=' rhs=expression {
-        $n = new Assignment($lhs.n, $rhs.n);
+        $n = new Assignment($ctx, $lhs.n, $rhs.n);
     }
     ;
 
@@ -133,7 +133,7 @@ returns [Print n]
         var arguments = new ArrayList<Expression>();
         for (var arg : $args)
             arguments.add(arg.n);
-        $n = new Print(arguments);
+        $n = new Print($ctx, arguments);
     }
     ;
 
